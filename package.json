@@ -1,0 +1,25 @@
+{
+  "name": "slider-shortcode-manager",
+  "version": "1.0.0",
+  "description": "Slider Shortcode Manager WordPress Plugin",
+  "scripts": {
+    "build": "webpack --mode production",
+    "dev": "webpack --mode development",
+    "watch": "webpack --watch --mode development"
+  },
+  "dependencies": {
+    "@babel/preset-env": "^7.16.8",
+    "babel-loader": "^8.2.3",
+    "css-loader": "^6.5.1",
+    "mini-css-extract-plugin": "^2.4.5",
+    "owl.carousel": "^2.3.4",
+    "sass": "^1.45.0"
+  },
+  "devDependencies": {
+    "clean-webpack-plugin": "^4.0.0",
+    "css-minimizer-webpack-plugin": "^3.3.1",
+    "sass-loader": "^13.3.3",
+    "terser-webpack-plugin": "^5.2.5",
+    "webpack-cli": "^5.1.4"
+  }
+}

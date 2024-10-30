@@ -1,0 +1,37 @@
+# Node and NPM
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+
+# Webpack build output
+/assets/build/
+
+# SASS cache
+.sass-cache/
+
+# Composer dependencies
+vendor/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE or editor-specific files
+*.sublime-project
+*.sublime-workspace
+.vscode/
+.idea/
+
+# Logs and databases
+*.log
+*.sql
+*.sqlite
+
+# WordPress specific
+wp-config.php
+.htaccess
+
+# Ignore compiled and minified CSS/JS (if generated locally)
+*.min.js
+*.min.css
