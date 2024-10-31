@@ -1,5 +1,5 @@
 <?php
-
+namespace Slider; // Define the namespace for the class
 class Slider_Assets_Manager {
 
     public static function register() {
