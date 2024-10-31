@@ -8,11 +8,12 @@ const isProduction = process.env.NODE_ENV === 'production';
 
 module.exports = {
     entry: {
-        main: './assets/src/js/main.js',
+        main: './assets/src/js/index.js',
     },
     output: {
         filename: '[name].min.js',
         path: path.resolve(__dirname, 'assets/build'),
+        clean: true, // Automatically cleans old files
     },
     module: {
         rules: [
@@ -39,12 +40,22 @@ module.exports = {
         ],
     },
     plugins: [
-        new CleanWebpackPlugin(), // Ensures a clean output directory
+        ...(isProduction ? [new CleanWebpackPlugin()] : []), // Cleans output in production only
         new MiniCssExtractPlugin({
             filename: '[name].min.css',
         }),
     ],
     optimization: {
+        splitChunks: {
+            chunks: 'all', // Splits vendor code into a separate chunk
+            cacheGroups: {
+                vendor: {
+                    test: /[\\/]node_modules[\\/]/,
+                    name: 'vendor',
+                    chunks: 'all',
+                },
+            },
+        },
         minimize: isProduction,
         minimizer: [
             new TerserPlugin(),      // Minify JavaScript files
