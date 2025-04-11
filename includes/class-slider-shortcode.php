@@ -9,14 +9,13 @@ class Slider_Shortcode {
     }
 
     public static function render_slider(array $atts): string {
-        error_log('Slider Shortcode - Raw Attributes: ' . print_r($atts, true));
-
         $atts = shortcode_atts([
             'numberofslides'   => -1,
             'defaultposttype'  => Slider_CPT_Manager::get_post_type(),
             'slidernavigation' => 'true',
             'autoplay'         => 'true',
             'linkto'           => '',
+            'context'          => 'default',
         ], $atts, 'slider');
 
         error_log('Slider Shortcode - After shortcode_atts: ' . print_r($atts, true));
@@ -26,11 +25,12 @@ class Slider_Shortcode {
         $navigation = filter_var($atts['slidernavigation'], FILTER_VALIDATE_BOOLEAN);
         $autoplay = filter_var($atts['autoplay'], FILTER_VALIDATE_BOOLEAN);
         $link_to = sanitize_text_field($atts['linkto']);
+        $context = sanitize_text_field($atts['context']);
 
-        error_log("Slider Shortcode - Post Type: $post_type, Number of Slides: $number_of_slides, Navigation: " . ($navigation ? 'true' : 'false') . ", Autoplay: " . ($autoplay ? 'true' : 'false') . ", LinkTo: '$link_to'");
+        error_log("Slider Shortcode - Context: $context Post Type: $post_type, Number of Slides: $number_of_slides, Navigation: " . ($navigation ? 'true' : 'false') . ", Autoplay: " . ($autoplay ? 'true' : 'false') . ", LinkTo: '$link_to'");
+
 
         if (!post_type_exists($post_type)) {
-            error_log("Post type '$post_type' does not exist, falling back to 'slider'");
             $post_type = Slider_CPT_Manager::get_post_type();
         }
 
@@ -42,29 +42,27 @@ class Slider_Shortcode {
 
         $slider_query = new WP_Query($args);
         error_log("Slider Query - Found Posts: " . $slider_query->found_posts);
-
         if ($slider_query->have_posts()) {
             $slider_id = 'slider-' . uniqid();
             $slider_html = sprintf(
-                '<div id="%s" class="swiper slider slider--active" data-navigation="%s" data-autoplay="%s">',
+                '<div id="%s" class="swiper slider slider--active" data-navigation="%s" data-autoplay="%s" data-context="%s">',
                 esc_attr($slider_id),
                 esc_attr($navigation ? 'true' : 'false'),
-                esc_attr($autoplay ? 'true' : 'false')
+                esc_attr($autoplay ? 'true' : 'false'),
+                esc_attr($context)
             );
             $slider_html .= '<div class="swiper-wrapper">';
 
-            // Check if post type has permalinks (except for 'slider')
             $post_type_obj = get_post_type_object($post_type);
             $has_permalinks = $post_type_obj->public && $post_type !== 'slider' && !empty(get_permalink($slider_query->posts[0]->ID));
 
-            // Resolve linkto URL once if needed
             $linkto_url = '';
             if (!empty($link_to) && ($post_type === 'slider' || !$has_permalinks)) {
                 $link_post = get_page_by_path($link_to, OBJECT, 'page');
                 if ($link_post) {
                     $linkto_url = get_permalink($link_post->ID);
                     error_log("Slider Shortcode - LinkTo URL: $linkto_url");
-                } else {
+                }else {
                     error_log("Slider Shortcode - LinkTo '$link_to' not found");
                 }
             }
@@ -80,14 +78,11 @@ class Slider_Shortcode {
                         ['alt' => esc_attr(get_the_title()), 'class' => 'slider__image']
                     );
                     if ($has_permalinks) {
-                        // Link to post permalink for non-'slider' public post types
                         $permalink = get_permalink($post_id);
                         $slider_html .= '<a href="' . esc_url($permalink) . '" class="slider__link">' . $thumbnail . '</a>';
                     } elseif (!empty($linkto_url)) {
-                        // Link to linkto URL for 'slider' or non-public post types
                         $slider_html .= '<a href="' . esc_url($linkto_url) . '" class="slider__link">' . $thumbnail . '</a>';
                     } else {
-                        // No link
                         $slider_html .= $thumbnail;
                     }
                 }
@@ -103,6 +98,8 @@ class Slider_Shortcode {
                 $slider_html .= '<div class="swiper-button-next"></div>';
             }
             $slider_html .= '</div>';
+
+            // error_log("Slider Shortcode - HTML Output: " . substr($slider_html, 0, 200)); // Debug first 200 chars
 
             wp_reset_postdata();
             return $slider_html;
