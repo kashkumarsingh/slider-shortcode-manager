@@ -1,58 +1,29 @@
-// Block: slider
-.slider {
-    &--active {
-        // Add any styles specific to when the slider is active
-        display: block;
-        overflow: hidden;
-    }
 
+@use '~swiper/css/bundle'; // Import Swiper CSS directly
+
+.slider {
     &__item {
         position: relative;
 
         img {
             max-width: 100%;
             height: auto;
-            border-radius: 8px;
+            width: 100%;
         }
     }
 
-    &__title {
-        font-size: 1.75rem;
-        margin-top: 1rem;
-        color: #333;
-        text-align: center;
-        font-weight: bold;
+}
+/* Swiper overrides */
 
-        // Styles to visually hide the title but keep it for SEO
-        &--hidden {
-            position: absolute; /* Position off the screen */
-            left: -9999px; /* Move off-screen */
-            width: 1px; /* Prevent element from taking up space */
-            height: 1px; /* Prevent element from taking up space */
-            overflow: hidden; /* Hide overflow */
-        }
-    }
+.swiper-pagination {
+    margin-top: 10px;
+    text-align: center;
+}
 
-    &__content {
-        margin-top: 0.5rem;
-        font-size: 1rem;
-        text-align: center;
-        color: #666;
-
-        // Styles to visually hide the content but keep it for SEO
-        &--hidden {
-            position: absolute; /* Position off the screen */
-            left: -9999px; /* Move off-screen */
-            width: 1px; /* Prevent element from taking up space */
-            height: 1px; /* Prevent element from taking up space */
-            overflow: hidden; /* Hide overflow */
-        }
-    }
-
-    &__no-items {
-        color: #999;
-        text-align: center;
-        padding: 1rem;
-        font-style: italic;
+.swiper-button-prev,
+.swiper-button-next {
+    color: #333;
+    &:after {
+        font-size: 20px;
     }
 }

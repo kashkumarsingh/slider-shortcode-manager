@@ -2,7 +2,7 @@ const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');  // Cleans build folder
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -13,7 +13,7 @@ module.exports = {
     output: {
         filename: '[name].min.js',
         path: path.resolve(__dirname, 'assets/build'),
-        clean: true, // Automatically cleans old files
+        clean: true,
     },
     module: {
         rules: [
@@ -24,6 +24,15 @@ module.exports = {
                     MiniCssExtractPlugin.loader,
                     'css-loader',
                     'sass-loader',
+                ],
+            },
+            // CSS from node_modules (e.g., Swiper)
+            {
+                test: /\.css$/,
+                include: /node_modules/,
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    'css-loader',
                 ],
             },
             // JavaScript
@@ -40,28 +49,18 @@ module.exports = {
         ],
     },
     plugins: [
-        ...(isProduction ? [new CleanWebpackPlugin()] : []), // Cleans output in production only
+        ...(isProduction ? [new CleanWebpackPlugin()] : []),
         new MiniCssExtractPlugin({
             filename: '[name].min.css',
         }),
     ],
     optimization: {
-        splitChunks: {
-            chunks: 'all', // Splits vendor code into a separate chunk
-            cacheGroups: {
-                vendor: {
-                    test: /[\\/]node_modules[\\/]/,
-                    name: 'vendor',
-                    chunks: 'all',
-                },
-            },
-        },
         minimize: isProduction,
         minimizer: [
-            new TerserPlugin(),      // Minify JavaScript files
-            new CssMinimizerPlugin(), // Minify CSS files
+            new TerserPlugin(),
+            new CssMinimizerPlugin(),
         ],
     },
     mode: isProduction ? 'production' : 'development',
-    devtool: isProduction ? false : 'source-map', // Source maps for easier debugging
+    devtool: isProduction ? false : 'source-map',
 };

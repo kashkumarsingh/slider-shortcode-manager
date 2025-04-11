@@ -12,8 +12,8 @@
     "babel-loader": "^8.2.3",
     "css-loader": "^6.5.1",
     "mini-css-extract-plugin": "^2.4.5",
-    "owl.carousel": "^2.3.4",
-    "sass": "^1.45.0"
+    "sass": "^1.45.0",
+    "swiper": "^11.2.6"
   },
   "devDependencies": {
     "clean-webpack-plugin": "^4.0.0",

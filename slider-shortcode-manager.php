@@ -1,11 +1,17 @@
 <?php
 /**
  * Plugin Name: Slider Shortcode Manager
- * Description: A plugin to create a shortcode for displaying sliders using Owl Carousel.
- * Version: 1.1
- * Author: Kashkumar Singh
- * License: GPL2
+ * Plugin URI: https://your-site.com/slider-shortcode-manager
+ * Description: A plugin to create a customizable slider shortcode using Owl Carousel, supporting multiple post types.
+ * Version: 2.0.0
+ * Author: KNS
+ * Author URI: https://your-site.com
+ * License: GPL-2.0+
+ * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain: slider-shortcode-manager
+ * Domain Path: /languages
+ * Requires at least: 6.0
+ * Requires PHP: 7.4
  */
 
 // Exit if accessed directly
@@ -13,10 +19,22 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+define('SLIDER_SHORTCODE_MANAGER_VERSION', '2.0.0');
+
 // Autoload Composer dependencies (if any)
-if (file_exists(__DIR__ . '/vendor/autoload.php')) {
-    require_once __DIR__ . '/vendor/autoload.php';
-}
+spl_autoload_register(function ($class_name) {
+    $prefix = 'Slider\\';
+    $base_dir = __DIR__ . '/includes/';
+    if (strpos($class_name, $prefix) === 0) {
+        $relative_class = substr($class_name, strlen($prefix));
+        $file = $base_dir . 'class-' . strtolower(str_replace('_', '-', $relative_class)) . '.php';
+        if (file_exists($file)) {
+            require $file;
+        } else {
+            error_log("Autoload failed: file $file does not exist.");
+        }
+    }
+});
 
 // Autoload classes
 spl_autoload_register(function ($class_name) {
@@ -42,26 +60,23 @@ spl_autoload_register(function ($class_name) {
 
 
 // Main Plugin Class with Singleton Pattern
-class SliderShortcodeManager
-{
+class SliderShortcodeManager {
     private static ?self $instance = null;
 
-    private function __construct()
-    {
+    private function __construct() {
         $this->define_constants();
         $this->initialize_components();
+        $this->check_version();
     }
 
-    public static function get_instance(): self
-    {
+    public static function get_instance(): self {
         if (self::$instance === null) {
             self::$instance = new self();
         }
         return self::$instance;
     }
 
-    private function define_constants(): void
-    {
+    private function define_constants(): void {
         if (!defined('CPT_MANAGER_TEXT_DOMAIN')) {
             define('CPT_MANAGER_TEXT_DOMAIN', 'slider-shortcode-manager');
         }
@@ -72,7 +87,14 @@ class SliderShortcodeManager
         \Slider\Slider_Shortcode::register();
         \Slider\Slider_Assets_Manager::register();
     }
+
+    private function check_version(): void {
+        $current_version = get_option('slider_shortcode_manager_version', '1.1');
+        if (version_compare($current_version, SLIDER_SHORTCODE_MANAGER_VERSION, '<')) {
+            update_option('slider_shortcode_manager_version', SLIDER_SHORTCODE_MANAGER_VERSION);
+            // Future: Add migration logic here if needed
+        }
+    }
 }
 
-// Initialize the plugin
 SliderShortcodeManager::get_instance();
